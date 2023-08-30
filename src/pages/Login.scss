@@ -1,0 +1,82 @@
+@import 'src/assets/scss/mixin';
+
+.home-page {
+  background-color: #dcecff;
+}
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+
+  @include ipad {
+    // margin-bottom: 80px;
+    justify-content: center;
+    align-items: center;
+  }
+  .home-card {
+    font-size: 16px;
+    max-width: 527px;
+    width: 100%;
+  }
+
+  .logo {
+    margin-bottom: 24px;
+    width: 127px;
+    padding-top: 24px;
+    @include ipad {
+      padding-top: 0px;
+      margin-bottom: 80px;
+      width: initial;
+    }
+  }
+  .login-pane {
+    @include ipad {
+      padding-left: 60px;
+      padding-right: 60px;
+    }
+  }
+
+  .oauth-btn-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .oauth-login-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #dcecff;
+      border: none;
+      width: 60px;
+      height: 60px;
+    }
+  }
+
+  // ::v-deep(.home-tabs .ant-tabs-nav) {
+    // margin-bottom: 40px;
+  // }
+
+  .card-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .home-bg {
+    display: none;
+    @include ipad {
+      display: block;
+      position: absolute;
+      bottom: 0;
+      right: 111px;
+    }
+  }
+  .home-divider {
+    margin: 32px 0;
+    font-size: 14px;
+  }
+}
+
+.text-gray {
+  color: #b7bac0 !important;
+}

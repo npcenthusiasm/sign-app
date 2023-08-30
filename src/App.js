@@ -1,13 +1,19 @@
 // import logo from './logo.svg';
 
-import { DatePicker } from "antd";
+// import { DatePicker } from "antd";
+import { Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
 
 // import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <DatePicker></DatePicker>
+      <Routes>
+        <Route path="/login" element={<Login />}></Route>
+        <Route path="*" element={<Login />}></Route>
+      </Routes>
+      {/* <DatePicker></DatePicker> */}
       {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
