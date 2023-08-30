@@ -5,8 +5,10 @@ import './Login.scss';
 
 import GoogleSvg from '../assets/images/google.svg'
 import FacebookSvg from '../assets/images/facebook.svg'
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
+  const  navigate = useNavigate()
   const [allowSubmit, setAllowSubmit] = useState(false)
   const [formData, setFormData] = useState({
     username: '',
@@ -43,6 +45,7 @@ export default function Login() {
   };
   const onFinish = (values) => {
     console.log('Success:', values);
+    navigate('/')
   };
 
   return (
@@ -91,6 +94,7 @@ export default function Login() {
               initialValues={{
                 remember: true,
               }}
+              
         onFinish={onFinish}
       >
         <Form.Item
