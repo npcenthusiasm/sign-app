@@ -6,14 +6,17 @@ import './Login.scss';
 import GoogleSvg from '../assets/images/google.svg'
 import FacebookSvg from '../assets/images/facebook.svg'
 import { useNavigate } from 'react-router-dom';
+import { auth, googleProvider } from '../config/firebase';
+import { createUserWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
 
 export default function Login() {
   const  navigate = useNavigate()
   const [allowSubmit, setAllowSubmit] = useState(false)
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   })
+  console.log(auth?.currentUser?.email);
   const handleInputChnage = (e) => {
     const { name, value } = e.target
     setFormData({
@@ -22,10 +25,44 @@ export default function Login() {
     })
     console.log(formData);
   }
+
+  const signIn = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, formData.email, formData.password)
+      navigate('/')
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const logout = async () => {
+    try {
+      await signOut(auth)
+    } catch (error) {
+      console.error(error)
+    }
+    
+  }
+
+  const signInWithGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider)
+    } catch (error) {
+      console.error(error)
+    }
+  }
   useEffect(() => {
-    const canSubmit = formData.username.trim() !== '' && formData.password.trim() !== ''
+    const canSubmit = formData.email.trim() !== '' && formData.password.trim() !== ''
     setAllowSubmit(canSubmit)
   }, [formData])
+
+  // useEffect(() => {
+  //   console.log(123);
+  //   if (auth?.currentUser?.email) {
+  //     console.log('auth?.currentUser?.email: ', auth?.currentUser?.email);
+  //     navigate('/')
+  //   }
+  // }, [])
 
   const items = [
     {
@@ -45,7 +82,8 @@ export default function Login() {
   };
   const onFinish = (values) => {
     console.log('Success:', values);
-    navigate('/')
+    signIn()
+    // navigate('/')
   };
 
   return (
@@ -81,7 +119,7 @@ export default function Login() {
                 <Button type="primary" size="large"  className="oauth-login-btn" icon={
 
                     <img src={GoogleSvg} alt="" />
-                }>
+                } onClick={signInWithGoogle}>
                 </Button>
               </Space>
             </div>
@@ -98,7 +136,7 @@ export default function Login() {
         onFinish={onFinish}
       >
         <Form.Item
-          name="username"
+          name="email"
           rules={[
             {
               required: true,
@@ -106,7 +144,7 @@ export default function Login() {
             },
           ]}
         >
-          <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="請輸入您的電子信箱" onChange={handleInputChnage} name='username' value={formData.username} />
+          <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="請輸入您的電子信箱" onChange={handleInputChnage} name='email' value={formData.email} />
         </Form.Item>
         <Form.Item
           name="password"
@@ -131,6 +169,9 @@ export default function Login() {
           <Button type="primary" htmlType="submit" block className="login-form-button" disabled={!allowSubmit}>
           登入
           </Button>
+        {/* <Button type="primary" htmlType="submit" block className="login-form-button" onClick={logout}>
+          登出
+          </Button> */}
         </Form.Item>
       </Form>
           </Card>

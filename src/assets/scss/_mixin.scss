@@ -34,3 +34,10 @@ $large-desktop: 1536px;
   }
 }
 
+
+
+@mixin text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

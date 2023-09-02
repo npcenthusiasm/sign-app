@@ -4,17 +4,25 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import Main from "./pages/Main";
+import { useContext, useReducer } from "react";
+import FirebaseContext, {  firebaseReducer, initState } from "./store/firebaseContext";
 
 // import './App.css';
 
 function App() {
+  // const FirebaseContext = useContext(firebaseContext)
+  const reducer = useReducer(firebaseReducer, initState)
   return (
     <div className="App">
-      <Routes>
-        <Route path="" element={<Home />}></Route>
-        <Route path="/login" element={<Login />}></Route>
-        <Route path="*" element={<Home />}></Route>
-      </Routes>
+      <FirebaseContext.Provider value={reducer}>
+        <Routes>
+          <Route path="" element={<Home />}></Route>
+          <Route path="/main" element={<Main />}></Route>
+          <Route path="/login" element={<Login />}></Route>
+          <Route path="*" element={<Home />}></Route>
+        </Routes>
+      </FirebaseContext.Provider>
       {/* <DatePicker></DatePicker> */}
       {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
