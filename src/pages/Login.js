@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Card, Input, Space, Form, Tabs, Divider } from 'antd';
+import { Button, Card, Input, Space, Form, Tabs, Divider, message } from 'antd';
 import './Login.scss';
 
 import GoogleSvg from '../assets/images/google.svg'
 import FacebookSvg from '../assets/images/facebook.svg'
 import { useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../config/firebase';
-import { createUserWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
 
-export default function Login() {
+const  Login =() =>  {
   const  navigate = useNavigate()
   const [allowSubmit, setAllowSubmit] = useState(false)
+  const [activeKey, setActiveKey] = useState('login')
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -28,10 +29,31 @@ export default function Login() {
 
   const signIn = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, formData.email, formData.password)
-      navigate('/')
+      if (activeKey === 'login') {
+        await signInWithEmailAndPassword(auth, formData.email, formData.password)
+        message.success('登入成功')
+        navigate('/')
+      } else if (activeKey === 'create') {
+        await createUserWithEmailAndPassword(auth, formData.email, formData.password)
+        navigate('/')
+        message.success('註冊成功')
+      }
     } catch (error) {
       console.error(error)
+
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+            message.error('此 Email 已被註冊')
+          break;
+          case 'auth/wrong-password':
+            message.error('帳號或密碼錯誤')
+          break;
+        
+      
+        default:
+          message.error('登入失敗')
+          break;
+      }
     }
   }
 
@@ -66,12 +88,12 @@ export default function Login() {
 
   const items = [
     {
-      key: '1',
+      key: 'login',
       label: '登入',
       children: 'Content of Tab Pane 1',
     },
     {
-      key: '2',
+      key: 'create',
       label: '註冊',
       children: 'Content of Tab Pane 2',
     },
@@ -79,6 +101,8 @@ export default function Login() {
   
   const onChange = (key) => {
     console.log(key);
+    setActiveKey(key)
+
   };
   const onFinish = (values) => {
     console.log('Success:', values);
@@ -98,7 +122,7 @@ export default function Login() {
               }
             }
             title={
-            <Tabs centered defaultActiveKey='1' items={items} onChange={onChange}>
+            <Tabs centered defaultActiveKey={activeKey} items={items} onChange={onChange}>
             
             </Tabs>
           } style={{ width: 300 }}>
@@ -106,7 +130,7 @@ export default function Login() {
             <div>
 
             <Space size={32} className="oauth-btn-wrap">
-                <Button type="primary" size="large" className="oauth-login-btn" icon={
+                {/* <Button type="primary" size="large" className="oauth-login-btn" icon={
                   <img
                     src={FacebookSvg}
                     alt=""
@@ -115,7 +139,7 @@ export default function Login() {
                   />
 
                 }>
-                </Button>
+                </Button> */}
                 <Button type="primary" size="large"  className="oauth-login-btn" icon={
 
                     <img src={GoogleSvg} alt="" />
@@ -181,3 +205,5 @@ export default function Login() {
   )
 }
 
+
+export default Login

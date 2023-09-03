@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useImperativeHandle, useRef,forwardRef } from "react"
 import { pdfToImage, printMultiPage } from '../helpers/pdf'
 
-const CanvasItem = ({ pdfUrl, uploadFile }) => {
+const CanvasItem = forwardRef(({ pdfUrl, uploadFile, handleTextPaste }, ref) => {
+  console.log('render');
   // const pdfData = 'https://firebasestorage.googleapis.com/v0/b/river-runner-369506.appspot.com/o/pdfFiles%2Fdownload.pdf969f82ac-c10e-424f-aa37-b9813adcf368?alt=media&token=2d9bd387-9505-4a76-98ea-f1878809de71'
   console.log('pdfUrl: ', pdfUrl);
   console.log('uploadFile: ', uploadFile);
@@ -43,8 +44,41 @@ const CanvasItem = ({ pdfUrl, uploadFile }) => {
 
   }
 
+  const updateText = (signText) => {
+    // console.log('c: ', c);
+    // console.log('updateText');
 
-  const loadFromFile = (file) => {
+    // console.log('childRef.current.fabricCanvas.current: ', childRef.current.fabricCanvas.current);
+    console.log('fabricCanvas.current: ', fabricCanvas.current);
+    // const left = fabricCanvas.current._previousPointer.x
+    // const top = fabricCanvas.current._previousPointer.y
+
+    const text = new window.fabric.Text(signText, {
+      left: 50,
+      top: 50,
+      hasControls: true
+    })
+    console.log('text: ', text);
+
+    fabricCanvas.current.add(text)
+    // fabricCanvas.current.renderAll()
+
+    // handleTextPaste(fabricCanvas.current)
+  }
+
+  const downloadPDFSelf = (downloadFn) => {
+    downloadFn([fabricCanvas.current])
+  }
+
+  useImperativeHandle(ref, () => {
+    return {
+      updateText,
+      downloadPDFSelf
+    };
+  });
+
+
+  const loadFromFile = async (file) => {
 
     const readBlob = (blob) => {
       return new Promise((resolve, reject) => {
@@ -55,129 +89,59 @@ const CanvasItem = ({ pdfUrl, uploadFile }) => {
       })
     }
 
-    const createPageCanvas = async (page = 1) => {
-
     const Base64Prefix = 'data:application/pdf;base64,'
 
     // 將檔案處理成 base64
-    file = await readBlob(file)
-
+    let pdfData = await readBlob(file)
+  
     // 將 base64 中的前綴刪去，並進行解碼
-      const data = atob(file.substring(Base64Prefix.length))
-      const pdfDoc = await window.pdfjsLib.getDocument({ data }).promise
-      const totalPages = pdfDoc.numPages
-      
+    const data = atob(pdfData.substring(Base64Prefix.length))
+    const pdfDoc = await window.pdfjsLib.getDocument({ data }).promise
+    const totalPages = pdfDoc.numPages
+    console.log('totalPages: ', totalPages)
+
+    const createPageCanvas = async (page = 1) => {
       const pdfPage = await pdfDoc.getPage(page)
   
       // 設定尺寸及產生 canvas
-      const viewport = pdfPage.getViewport({ scale: 1 })
-      // const viewport = pdfPage.getViewport({ scale: window.devicePixelRatio })
-      // const canvas = canvasDom.current
-      // const context = canvas.getContext('2d')
+      const viewport = pdfPage.getViewport({ scale: window.devicePixelRatio })
+      const canvas = document.createElement('canvas')
+      const context = canvas.getContext('2d')
   
       // 設定 PDF 所要顯示的寬高及渲染
-      // canvas.height = viewport.height
-      // canvas.width = viewport.width
-      fabricCanvas.current.setWidth(viewport.width);
-      fabricCanvas.current.setHeight(viewport.height);
+      canvas.height = viewport.height
+      canvas.width = viewport.width
       const renderContext = {
-        canvasContext: fabricCanvas.current.getContext('2d'),
+        canvasContext: context,
         viewport
       }
       const renderTask = pdfPage.render(renderContext)
   
       // 回傳做好的 PDF canvas
-      return renderTask.promise.then(() => fabricCanvas.current)
+      return renderTask.promise.then(() => canvas)
     }
 
-    createPageCanvas()
+    // step 將PDF
+    const pdfImgCanvas = await createPageCanvas()
+
+
+    const pdfImage = await pdfToImage(pdfImgCanvas)
+
+      // 透過比例設定 canvas 尺寸
+      fabricCanvas.current.setWidth(pdfImage.width / window.devicePixelRatio)
+      fabricCanvas.current.setHeight(pdfImage.height / window.devicePixelRatio)
+
+      // 將 PDF 畫面設定為背景
+      fabricCanvas.current.setBackgroundImage(pdfImage, fabricCanvas.current.renderAll.bind(fabricCanvas.current))
   }
-//   const renaderCanvas = async () => {
-// console.log('pdfData instanceof File', pdfData instanceof File);
-//     if (pdfData !== '') {
-//       loadFromUrl(pdfData)
-//     }
-
-
-
-//   // 從 url 讀取圖片
-  
-//   // 回傳圖片
-//   // return new window.fabric.Image(pdfData, {
-//     //   id: 'renderPDF',
-//     //   scaleX: scale,
-//     //   scaleY: scale
-//     // })
-    
-
-//      // ------------------------------------------------------------------------
-//     // ------------------------------------------------------------------------
-//     // ------------------------------------------------------------------------
-//     // ------------------------------------------------------------------------
-
-  
-//     // const fabricCanvas = new window.fabric.Canvas(canvasDom.current)
-//   //   window.fabric.Image.fromURL(pdfData, img => {
-//   //     console.log('img: ', img);
-//   //     const oImg = img.set({
-//   //     // 這邊可以設定上下左右距離、角度、寬高等等
-//   //       left: 0,
-//   //       top: 100,
-//   //       angle: 15,
-//   //       width: 500,
-//   //       height: 500
-//   //     })
-
-
-//   //     // 將圖片縮放到寬高
-//   // // const scale = 1 / window.devicePixelRatio
-
-//   //     // oImg.scaleToWidth(img.width)
-//   //     // oImg.scaleToHeight(img.height)
-//   //     // 記得要加進入才會顯示
-//   //     // console.log('fabricCanvas: ', fabricCanvas);
-//   //     // fabricCanvas.add(img)
-//   //     // 使用亮度濾鏡
-//   //     // const filter = new fabric.Image.filters.Brightness({
-//   //     //   brightness: 0.5
-//   //     // })
-//   //     // oImg.filters.push(filter)
-//   //     // oImg.applyFilters()
-//   //     fabricCanvas.setWidth(img.width / window.devicePixelRatio)
-//   //      // // 透過比例設定 canvas 尺寸
-//   //     fabricCanvas.setHeight(img.height / window.devicePixelRatio)
-//   //     fabricCanvas.setBackgroundImage(oImg, fabricCanvas.renderAll.bind(fabricCanvas))
-
-//   //   })
-
-
-//     // ------------------------------------------------------------------------
-//     // ------------------------------------------------------------------------
-//     // ------------------------------------------------------------------------
-//     // ------------------------------------------------------------------------
-
-//     //  from file
-//     // const canvas = new window.fabric.Canvas(canvasDom.current)
-
-//     // const pdfImage = await pdfToImage(pdfData)
-//     // // 透過比例設定 canvas 尺寸
-//     // canvas.setWidth(pdfImage.width / window.devicePixelRatio)
-//     // canvas.setHeight(pdfImage.height / window.devicePixelRatio)
-//     // // 將 PDF 畫面設定為背景
-//     // canvas.setBackgroundImage(pdfImage, canvas.renderAll.bind(canvas))
-//   }
-
 
   useEffect(() => {
+    console.log('onchnge');
     if (pdfUrl && pdfUrl !== '') {
       loadFromUrl(pdfUrl)
     } else if (uploadFile) {
       loadFromFile(uploadFile)
     }
-
-    
-    // console.log('pdfData: ', pdfData);
-    // renaderCanvas()
   }, [pdfUrl, uploadFile])
 
 
@@ -186,5 +150,5 @@ const CanvasItem = ({ pdfUrl, uploadFile }) => {
       <canvas ref={canvasDom} width={500} height={300}></canvas>
     </div>
   )
-}
+})
 export default CanvasItem

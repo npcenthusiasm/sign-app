@@ -1,12 +1,15 @@
-import { useContext, useEffect, useState } from "react";
-import { Layout, Tabs, Card, Col, Row, Tag, Space } from "antd"
+import { useEffect, useState } from "react";
+import { Layout, Tabs, Card, Col, Row, Tag, Space, Empty, Button } from "antd"
 import { Header,  Content } from "antd/es/layout/layout"
-import { getDownloadURL, listAll, ref } from "firebase/storage";
-import { storage } from "../config/firebase";
+import { listAll, ref } from "firebase/storage";
+import { auth, storage } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
-import FirebaseContext from "../store/firebaseContext";
 import Logo from '../assets/images/Logo.png'
-import './Main.scss'
+import './DocView.scss'
+import { useDispatch } from "react-redux";
+import { setSignToEdit } from "../slice/SignSlice";
+import EmptySvg from '../assets/images/empty.svg'
+import './DocView.scss'
 
 const headerStyle = {
   textAlign: 'center',
@@ -19,15 +22,15 @@ const headerStyle = {
 const contentStyle = {
   backgroundColor: '#F1F2F5',
   padding: '0 50px',
-  // FIXME:
   minHeight: 'calc(100vh - 65px)'
 }
 
-
-const Main = () => {
+const DocView = () => {
   const navigate = useNavigate()
-  const [state, dispatch]= useContext(FirebaseContext)
-  const pdfFileListRef = ref(storage, 'pdfFiles/')
+  const dispatch  = useDispatch()
+  const uid = auth?.currentUser?.uid
+  console.log('auth: ', auth);
+  const pdfFileListRef = ref(storage, `pdfFiles/${uid}`)
   const [pdfFileList, setPdfFileList] = useState([])
   const [storageList, setStorageList] = useState([])
   const tabItems = [
@@ -36,26 +39,26 @@ const Main = () => {
       label: '待自己簽署',
       children:  '',
     },
-    {
-      key: '2',
-      label: '待他人簽署',
-      children: '',
-    },
-    {
-      key: '3',
-      label: '已完成',
-      children: '',
-    },
-    {
-      key: '4',
-      label: '已取消',
-      children: '',
-    },
-    {
-      key: '5',
-      label: '草稿',
-      children: '',
-    },
+    // {
+    //   key: '2',
+    //   label: '待他人簽署',
+    //   children: '',
+    // },
+    // {
+    //   key: '3',
+    //   label: '已完成',
+    //   children: '',
+    // },
+    // {
+    //   key: '4',
+    //   label: '已取消',
+    //   children: '',
+    // },
+    // {
+    //   key: '5',
+    //   label: '草稿',
+    //   children: '',
+    // },
   ];
 
   
@@ -84,7 +87,7 @@ const Main = () => {
 
     }
     getListAll()
-  }, [])
+  }, [auth.currentUser])
 
   return (
     
@@ -92,23 +95,50 @@ const Main = () => {
       <Header style={headerStyle}>
         <img src={Logo} alt="" className="logo" width="89" />
       </Header>
-      <Header style={headerStyle}>
-          <div>Main</div>
+      <Header style={headerStyle} className="doc-view-header" >
+        <Tabs defaultActiveKey='1' items={tabItems} className="doc-view-tabs"> </Tabs>
+        <Button type="primary" onClick={() => {
+            navigate('/uploadDoc')
+        }}>uploadDoc</Button>
+        <Button type="primary" onClick={() => {
+            navigate('/')
+        }}>立即新增</Button>
+
       </Header>
       <Content style={contentStyle}>
-        <Tabs defaultActiveKey='1' items={tabItems} > </Tabs>
         <Row gutter={16}>
           {
-            storageList.map(fileInfo => {
+            storageList.length === 0
+              ? (
+                <div  style={{
+                  width: '100%',
+                  minHeight: '80vh',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                  <Empty
+                    image={EmptySvg}
+                    description="目前尚無需簽署的文件"
+                  >
+                    <Button type="primary" onClick={() => {
+                      navigate('/')
+                  }}>立即新增</Button>
+                  </Empty>
+                </div>
+
+                )
+              :
+              storageList.map(fileInfo => {
               return (
                 <Col key={fileInfo.name}>
                   <Card
                     className="pdf-card"
+                    style={{
+                      marginBottom: '16px'
+                    }}
                     onClick={() => {
-                      dispatch({
-                        type: 'SET_SELECTED_PDF_FILE_REF',
-                        payload: fileInfo
-                      })
+                      dispatch(setSignToEdit(fileInfo))
                       navigate('/home')
                     }}
                   >
@@ -149,4 +179,4 @@ const Main = () => {
 }
 
 
-export default Main
+export default DocView
