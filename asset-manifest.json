@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/sign-app/static/css/main.97f94a06.css",
+    "main.js": "/sign-app/static/js/main.4b72834d.js",
+    "static/media/empty.svg": "/sign-app/static/media/empty.52c19be95d353fb5e48aebdc08ace12c.svg",
+    "index.html": "/sign-app/index.html",
+    "static/media/google.svg": "/sign-app/static/media/google.a123555a3da47106b946ff70bb2ed436.svg",
+    "static/media/facebook.svg": "/sign-app/static/media/facebook.8831dc2b51bd8fbae879d2af0e97c6f9.svg",
+    "main.97f94a06.css.map": "/sign-app/static/css/main.97f94a06.css.map",
+    "main.4b72834d.js.map": "/sign-app/static/js/main.4b72834d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.97f94a06.css",
+    "static/js/main.4b72834d.js"
+  ]
+}
