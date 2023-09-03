@@ -24,7 +24,6 @@ const  Login =() =>  {
       ...formData,
       [name]: value
     })
-    console.log(formData);
   }
 
   const signIn = async () => {
@@ -32,10 +31,10 @@ const  Login =() =>  {
       if (activeKey === 'login') {
         await signInWithEmailAndPassword(auth, formData.email, formData.password)
         message.success('登入成功')
-        navigate('/')
+        navigate('/docView')
       } else if (activeKey === 'create') {
         await createUserWithEmailAndPassword(auth, formData.email, formData.password)
-        navigate('/')
+        navigate('/docView')
         message.success('註冊成功')
       }
     } catch (error) {
@@ -45,10 +44,13 @@ const  Login =() =>  {
         case 'auth/email-already-in-use':
             message.error('此 Email 已被註冊')
           break;
-          case 'auth/wrong-password':
+        case 'auth/wrong-password':
             message.error('帳號或密碼錯誤')
           break;
         
+        case 'auth/weak-password':
+          message.error('密碼至少6位數')
+          break;
       
         default:
           message.error('登入失敗')
@@ -57,20 +59,24 @@ const  Login =() =>  {
     }
   }
 
-  const logout = async () => {
-    try {
-      await signOut(auth)
-    } catch (error) {
-      console.error(error)
-    }
+  // const logout = async () => {
+  //   try {
+  //     await signOut(auth)
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
     
-  }
+  // }
 
   const signInWithGoogle = async () => {
     try {
       await signInWithPopup(auth, googleProvider)
+      navigate('/docView')
+      message.success('登入成功')
     } catch (error) {
       console.error(error)
+      message.error('登入失敗')
+
     }
   }
   useEffect(() => {
@@ -100,12 +106,9 @@ const  Login =() =>  {
   ];
   
   const onChange = (key) => {
-    console.log(key);
     setActiveKey(key)
-
   };
   const onFinish = (values) => {
-    console.log('Success:', values);
     signIn()
     // navigate('/')
   };
@@ -148,7 +151,7 @@ const  Login =() =>  {
               </Space>
             </div>
 
-        <Divider className="home-divider text-gray">或使用電子信箱登入</Divider>
+        <Divider className="home-divider text-gray">或使用電子信箱{activeKey === 'login' ? '登入' : '註冊'}</Divider>
             
           <Form
               name="normal_login"
@@ -191,7 +194,8 @@ const  Login =() =>  {
 
         <Form.Item>
           <Button type="primary" htmlType="submit" block className="login-form-button" disabled={!allowSubmit}>
-          登入
+                  
+                  {activeKey === 'login' ? '登入' : '註冊'}
           </Button>
         {/* <Button type="primary" htmlType="submit" block className="login-form-button" onClick={logout}>
           登出

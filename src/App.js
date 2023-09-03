@@ -9,13 +9,12 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/main" element={<DocView />}></Route>
+        <Route path="/docView" element={<DocView />}></Route>
         <Route path="/uploadDoc" element={<UploadDocView />}></Route>
         <Route path="/confirmDoc" element={<ConfirmDocView />}></Route>
         <Route path="/signDoc" element={<SignView />}></Route>
-        
         <Route path="/login" element={<Login />}></Route>
-        <Route path="*" element={<DocView />}></Route>
+        {/* <Route path="*" element={<DocView />}></Route> */}
       </Routes>
     </div>
   );

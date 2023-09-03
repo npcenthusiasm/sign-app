@@ -14,8 +14,8 @@ export const ConfirmDocView = () => {
     <>
       <Layout >
         <StepProgress currentStep="2">
-          <Link to="/uploadDoc">prev</Link>
-          <Link to="/signDoc">next</Link>
+          {/* <Link to="/uploadDoc">prev</Link>
+          <Link to="/signDoc">next</Link> */}
         </StepProgress>
         <Content style={contentStyle}>
           <Card style={{

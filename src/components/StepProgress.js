@@ -56,7 +56,7 @@ export const StepProgress = ({ currentStep, children }) => {
       <Header style={headerStyle}>
         <Steps current={currentStep} items={items} />
         {/* <button onClick={logFiles}>logFiles</button> */}
-        <Link to="/main" >main</Link>
+        {/* <Link to="/docView" >docView</Link> */}
         { children }
         {/* <button onClick={() => navigate('/main')}>prev</button> */}
         {/* <button onClick={() => setCurrentStep(currentStep + 1)}>next</button> */}

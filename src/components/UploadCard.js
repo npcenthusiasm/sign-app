@@ -84,17 +84,16 @@ const UploadCard = () => {
         <p className="ant-upload-hint">或直接拖放檔案進來</p>
       </Dragger>,
     },
-    {
-      key: '2',
-      label: '掃描檔案',
-      children: '',
-    },
-    {
-      key: '3',
-      label: '歷史上傳',
-      children: '',
-    },
-    
+    // {
+    //   key: '2',
+    //   label: '掃描檔案',
+    //   children: '',
+    // },
+    // {
+    //   key: '3',
+    //   label: '歷史上傳',
+    //   children: '',
+    // },
   ];
   return (
     <Tabs defaultActiveKey='1' items={tabItems} > </Tabs>

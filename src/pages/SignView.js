@@ -1,87 +1,61 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Card, Layout ,message, Steps } from 'antd';
-import { getDocs, collection, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { getBytes, getDownloadURL, listAll, ref, uploadBytes } from 'firebase/storage'
-import { auth, db, storage } from '../config/firebase';
-import { v4 } from 'uuid';
-import UploadCard from '../components/UploadCard';
-import ConfirmUpload from '../components/ConfirmUpload';
+import { Button, Layout, Space  } from 'antd';
 import Sign from '../components/Sign';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import StepProgress from '../components/StepProgress';
-
-
-const { Header,  Content } = Layout;
-
-const headerStyle = {
-  textAlign: 'center',
-  height: 65,
-  display: 'flex',
-  alignItems: 'center',
-  backgroundColor: '#ffffff',
-  boxShadow: '0px 0px 15px 0px rgba(25, 26, 27, 0.08)'
-};
-
-const contentStyle = {
-  backgroundColor: '#F1F2F5',
-  // FIXME:
-  minHeight: 'calc(100vh - 65px)'
-}
-
-const steps = [
-  {
-    title: '上傳檔案',
-    content: '',
-    children: ''
-  },
-  {
-    title: '確認上傳檔案',
-    content: '',
-  },
-  {
-    title: '製作簽署檔案',
-    content: '',
-  },
-  {
-    title: '下載簽署檔案',
-    content: '',
-  },  
-];
-
+import { useDispatch, useSelector } from 'react-redux';
+import { resetSignCanvas, selectSignCanvas } from '../slice/SignSlice';
+import { downloadMultiPagePDF } from '../helpers/downloadPDF';
 
 export const SignView = () => {
+  const navigete = useNavigate()
+
   // const { token } = theme.useToken();
-  // const currentStep = useRef(2);
-  const [currentStep, setCurrentStep] = useState(2)
+  // const currentStep = useRef('3');
+  const dispatch = useDispatch()
+  
+  const [currentStep, setCurrentStep] = useState('3');
   // const [form] = Form.useForm()
   // const [collapsed, setCollapsed] = useState(false);
-  const [fileList, setFileList] = useState([])
-  const filesCollectionsRef = collection(db, 'files')
+  // const [fileList, setFileList] = useState([])
+  // const filesCollectionsRef = collection(db, 'files')
   // const pafFileListRef = ref(storage, 'pdfFiles/')
-  const [fileUpload, setFileUpload] = useState(null)
+  // const [fileUpload, setFileUpload] = useState(null)
+  const signCanvas = useSelector(selectSignCanvas)
+  console.log('signCanvas: ', signCanvas);
+
+  const hamdleDownload = () => {
+    // downloadPDF(canvasInstanceList.value[0])
+    console.log('signCanvas: ', signCanvas);
+    downloadMultiPagePDF(signCanvas)
+    setCurrentStep('4')
+    // currentStep.current = '4'
+  }
 
   // const [pdfFileList, setpdfFileList] = useState([])
-  const getFiles = async () => {
-    // collection
-    try {
-      const data = await getDocs(filesCollectionsRef)
-      console.log('data: ', data);
-      const filterData = data.docs.map(doc => {
-        return {
-          ...doc.data(),
-          id: doc.id
-        }
-      })
-      setFileList(filterData)
-      console.log('filterData: ', filterData);
+  // const getFiles = async () => {
+  //   // collection
+  //   try {
+  //     const data = await getDocs(filesCollectionsRef)
+  //     console.log('data: ', data);
+  //     const filterData = data.docs.map(doc => {
+  //       return {
+  //         ...doc.data(),
+  //         id: doc.id
+  //       }
+  //     })
+  //     setFileList(filterData)
+  //     console.log('filterData: ', filterData);
       
-    } catch (error) {
-        console.error(error)
-    }
-  }
+  //   } catch (error) {
+  //       console.error(error)
+  //   }
+  // }
+
+ 
+
   useEffect(() => {
-  
-    getFiles()
+    // getFiles()
   }, [])
 
 
@@ -183,13 +157,33 @@ export const SignView = () => {
   //     console.error(error)
   //   }
   // }
- 
+
+  useEffect(() => {
+    // 離開始清除
+    dispatch(resetSignCanvas())
+  }, [navigete])
+  
+  
   return (
     <>
       {
         <Layout >
-          <StepProgress currentStep="3">
-            <Link to="/confirmDoc">prev</Link>
+          <StepProgress currentStep={currentStep}>
+            <Space size={8} style={{
+            marginLeft: '20px'
+          }}>
+            <Button type="default" onClick={() => {
+                navigete('/docView')
+                dispatch(resetSignCanvas())
+                
+          }}>
+              取消
+            </Button>
+            <Button type="primary" onClick={hamdleDownload}>
+              下載檔案
+              </Button>
+              </Space>
+            {/* <Link to="/confirmDoc">prev</Link> */}
             {/* <Link to="/signDoc">next</Link> */}
           </StepProgress>
           <Sign/>

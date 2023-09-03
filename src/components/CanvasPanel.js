@@ -5,8 +5,9 @@ import CanvasItem from "./CanvasItem"
 import { Button, Input, Layout, Menu, Modal, Space } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { selectShowModal, setShowModal } from "../slice/SignSlice";
+import CreateSignCanvas from "./CreateSignCanvas";
 
-const CanvasPanel = ({ pdfUrl, uploadFile }) => {
+const CanvasPanel = ({ pdfUrl, uploadFile, menuActiveKey }) => {
   // console.log('pdfFileList: ', pdfFileList);
   const [pdfDataList, setPdfDataList] = useState([])
   // const renderPDF = async (file) => {
@@ -20,6 +21,7 @@ const CanvasPanel = ({ pdfUrl, uploadFile }) => {
   //   renderPDF(e.target.files[0])
   // }
   const childRef = useRef(null);
+  const signCanvasdRef = useRef(null)
   const [inputText, setInputText] = useState('')
 
   // const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,11 +34,23 @@ const CanvasPanel = ({ pdfUrl, uploadFile }) => {
     // setIsModalOpen(true);
   };
   const handleOk = () => {
-    handleTextPaste()
+    switch (menuActiveKey) {
+      case 'sign':
+        handleSignImgPaste()
+        break;
+      case 'text':
+        handleTextPaste()
+    
+      default:
+        break;
+    }
     dispatch(setShowModal(false))
-
     // setIsModalOpen(false);
   };
+
+
+
+
   const handleCancel = () => {
     // setIsModalOpen(false);
     dispatch(setShowModal(false))
@@ -47,10 +61,30 @@ const CanvasPanel = ({ pdfUrl, uploadFile }) => {
   };
   const onInputChange = (e) => {
     setInputText(e.target.value)
+  }
+
+  const onDraw = () => {
     
   }
+  
   const handleTextPaste = () => {
     childRef.current.updateText(inputText)
+  }
+
+  const handleSignImgPaste = () => {
+    // NOTE: 流程要再條
+    const signCanvas = signCanvasdRef.current.getCanvas()
+    const imgSrc = signCanvas.toDataURL('image/png')
+    // 
+    const getPDFCanvas =  childRef.current.getPDFCanvas()
+      window.fabric.Image.fromURL(imgSrc, function (image) {
+      // 設定簽名出現的位置及大小
+      image.top = 20
+      image.left = 20
+      image.scaleX = 0.4
+      image.scaleY = 0.4
+      getPDFCanvas.add(image)
+    })
   }
   
 
@@ -67,31 +101,36 @@ const CanvasPanel = ({ pdfUrl, uploadFile }) => {
 
   return (
     <div>
-      <button onClick={downloadPDF2}>downloadPDF2</button>
+      {/* <button onClick={downloadPDF2}>downloadPDF2</button> */}
 
       <div className="" style={{
         margin: '24px 32px'
       }}>
-         <Button type="primary" onClick={showModal}>
+         {/* <Button type="primary" onClick={showModal}>
           Open Modal
-        </Button>
+        </Button> */}
 
-<Modal title="新增簽名" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} okText="使用" cancelText="取消">
-        <Space size={16} direction="vertical" style={{
-             display: 'flex'
-           }}>
-          <Input
-            defaultValue={inputText}
-            size="large"
-            placeholder="請輸入文字"
-            onChange={onInputChange}
-          >
-          </Input>
-
-          {/* <Button className="save" type="primary" onClick={handleTextPaste}
-            >使用
-          </Button> */}
-        </Space>
+        <Modal title="新增簽名" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} okText="使用" cancelText="取消">
+          {
+            menuActiveKey === 'text' && (
+              <Space size={16} direction="vertical" style={{
+                  display: 'flex'
+                }}>
+              <Input
+                defaultValue={inputText}
+                size="large"
+                placeholder="請輸入文字"
+                onChange={onInputChange}
+              >
+              </Input>
+            </Space>
+            )
+          }
+          {
+            menuActiveKey === 'sign' && (
+              <CreateSignCanvas ref={signCanvasdRef}/>
+            )
+          }
         </Modal>
 
 

@@ -3,15 +3,15 @@ import {
   DesktopOutlined,
   PieChartOutlined,
 } from '@ant-design/icons';
-import { Button, Input, Layout, Menu,  message } from "antd";
+import { Layout, Menu,  message } from "antd";
 import Sider from "antd/es/layout/Sider";
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CanvasPanel from "./CanvasPanel";
 import { getDownloadURL, ref } from "firebase/storage";
 import { storage } from "../config/firebase";
-import { selectCurrentSign, selectSignToEditRefPath, setShowModal } from "../slice/SignSlice";
+import { selectSignToEditRefPath, setShowModal } from "../slice/SignSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { getFileNameFromRef } from "../utils";
+import {getFileNameFromRefPath } from "../utils";
 
 
 const headerStyle = {
@@ -46,33 +46,42 @@ function getItem(label, key, icon, children) {
 }
 
 const Sign = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [menuActiveKey, setMenuActiveKey] = useState('sign');
   const [uploadFile, setUploadFile] = useState(null)
+
   const [pdfUrl, setPdfUrl] = useState('')
   const signToEditRefPath = useSelector(selectSignToEditRefPath)
   
+  
   const dispatch = useDispatch()
   
-  const currentSign = useSelector(selectCurrentSign)
-  console.log('currentSign: ', currentSign);
+  // const currentSign = useSelector(selectCurrentSign)
+  // 
   // const selectedFileRef = ref(storage, `pdfFiles/${docId}`)
   const menuItems = [
-    getItem('簽名', '1', <PieChartOutlined />),
-    getItem('日期', '2', <DesktopOutlined />),
-    getItem('文字', '3', <DesktopOutlined />,),
+    getItem('簽名', 'sign', <PieChartOutlined />),
+    // getItem('日期', '2', <DesktopOutlined />),
+    getItem('文字', 'text', <DesktopOutlined />,),
   ];
 
   const handleMenuClick = ({ item, key, keyPath }) => {
-    console.log('key: ', key);
-    if (key === '1') {
-      console.log(11);
-      dispatch(setShowModal(true))
-
+    
+    setMenuActiveKey(key)
+    if (key === 'text') {
+      const data = {
+          title: '新增文字'
+        }
+      
+    } else if (key === 'sign') {
+      const data = {
+        title: '新增簽名'
+      }
     }
-    console.log('ok');
-    // console.log('keyPath: ', keyPath);
-    // console.log('key: ', key);
-    // console.log('item: ', item);
+    dispatch(setShowModal(true))
+    
+    // 
+    // 
+    // 
     
   }
 
@@ -84,16 +93,16 @@ const Sign = () => {
 
   useEffect(() => {
     const getSingleFileUrl = async () => {
-      if (!currentSign) {
+      if (!signToEditRefPath) {
         return
       }
       try {
         message.info(`載入中 ...`);
         
-        console.log('state.selectedFileRef: ', currentSign);
+        // 
         const pathRef = ref(storage, signToEditRefPath)
         const url = await getDownloadURL(pathRef)
-        console.log('url: ', url);
+        
         setUploadFile(null)
         setPdfUrl(url)
         message.success(`載入成功`);
@@ -104,7 +113,7 @@ const Sign = () => {
 
     }
     getSingleFileUrl()
-  }, [currentSign])
+  }, [signToEditRefPath])
 
     const inputOnChange2 = (e) => {
       setPdfUrl('')
@@ -112,20 +121,20 @@ const Sign = () => {
   }
 
   // useEffect(() => {
-  //   console.log(pdfFileList);
+  //   
   // }, [pdfFileList])
   return (
     <>
       <Header style={headerStyle}>
         <div>
         <PieChartOutlined style={{marginRight: '20px'}}/>
-        {currentSign && getFileNameFromRef(currentSign)}
+        {signToEditRefPath && getFileNameFromRefPath(signToEditRefPath)}
       </div>  
       </Header>
       <Layout hasSider>
-        <Sider  style={siderStyle} collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+        <Sider style={siderStyle}>
           <div className="demo-logo-vertical" />
-          <Menu defaultSelectedKeys={['1']} mode="inline" items={menuItems} onClick={handleMenuClick} />
+          <Menu defaultSelectedKeys={menuActiveKey} mode="inline" items={menuItems} onClick={handleMenuClick} />
         </Sider>
           <Content style={contentStyle}>
             
@@ -136,11 +145,11 @@ const Sign = () => {
             accept="application/pdf"
             onChange={inputOnChange2}></input> */}
       
-            { JSON.stringify(pdfUrl)  }
+            {/* { JSON.stringify(pdfUrl)  } */}
             <br />
             {/* { state } */}
             </div>
-            <CanvasPanel pdfUrl={pdfUrl} uploadFile={uploadFile}></CanvasPanel>
+            <CanvasPanel pdfUrl={pdfUrl} uploadFile={uploadFile} menuActiveKey={menuActiveKey}></CanvasPanel>
             {/* <CanvasPanel pdfFileList={[fileInfo.url]}></CanvasPanel> */}
           </Content>
       </Layout>

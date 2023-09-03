@@ -20,24 +20,27 @@ export const SignSlice = createSlice({
       console.log('payload: ', action.payload);
       state.currentSignRefPath = action.payload
     },
-    setSignCanvasToList:(state, action) => {
-      state.signCanvas.push(action.payload)
+    setSignCanvasToList: (state, action) => {
+      console.log('action.payload: ', action.payload);
+      console.log(' state.signCanvas: ', state.signCanvas);
+      state.signCanvas = [...state.signCanvas, action.payload]
+    },
+
+    resetSignCanvas: (state) => {
+      state.signCanvas = []
     },
     setShowModal:(state, action) => {
       state.showModal = action.payload
     }
-    // resetSignee: (state, action) => {
-    //   console.log('resetSignee');
-    //   state.signees = [];
-    // }
   },
 });
 
-export const { setSignToEdit, setShowModal, setSignToEditRefPath } = SignSlice.actions;
+export const { setSignToEdit, setShowModal, setSignToEditRefPath, setSignCanvasToList, resetSignCanvas } = SignSlice.actions;
 
 export const selectCurrentSign = state => state.sign.currentSign;
 export const selectShowModal = state => state.sign.showModal;
 export const selectSignToEditRefPath = state => state.sign.currentSignRefPath;
+export const selectSignCanvas = state => state.sign.signCanvas;
 
 
 export default SignSlice.reducer;

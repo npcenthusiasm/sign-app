@@ -63,6 +63,7 @@ const ConfirmUpload = () => {
         rules={[
           {
             required: true,
+            message: '文件名稱必填'
           },
         ]}
       >
@@ -80,7 +81,7 @@ const ConfirmUpload = () => {
       >
         <Input disabled/>
       </Form.Item>
-      <Form.Item
+      {/* <Form.Item
         name="tag"
         label="建立標籤"
         rules={[
@@ -90,9 +91,13 @@ const ConfirmUpload = () => {
         ]}
       >
         <Input />
-      </Form.Item>
+      </Form.Item> */}
       <Form.Item>
-        <Space>
+        <Space style={{
+          display: 'flex',
+          justifyContent: 'space-between'
+          
+        }}>
           {/* <SubmitButton form={form} /> */}
           <Button onClick={() => {
             navigete('/uploadDoc')
