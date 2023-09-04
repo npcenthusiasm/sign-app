@@ -1,11 +1,15 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef } from "react"
-
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef
+} from 'react'
 
 const CreateSignCanvas = forwardRef((_, ref) => {
   const canvasDom = useRef(null)
   const isPainting = useRef(false)
-  
-  console.log('render');
+
+  console.log('render')
 
   const getPaintPosition = (e) => {
     const canvasSize = canvasDom.current.getBoundingClientRect()
@@ -23,7 +27,7 @@ const CreateSignCanvas = forwardRef((_, ref) => {
     }
   }
 
-  const  draw = (e) => {
+  const draw = (e) => {
     // 滑鼠移動過程中，若非繪圖狀態，則跳出
     if (!isPainting.current) return
 
@@ -36,15 +40,15 @@ const CreateSignCanvas = forwardRef((_, ref) => {
     ctx.stroke()
   }
 
-  const  startPosition = (e) => {
+  const startPosition = (e) => {
     e.preventDefault()
     isPainting.current = true
   }
 
-  const finishedPosition = () =>  {
+  const finishedPosition = () => {
     isPainting.current = false
     const ctx = canvasDom.current.getContext('2d')
-    
+
     ctx.beginPath()
   }
 
@@ -62,14 +66,13 @@ const CreateSignCanvas = forwardRef((_, ref) => {
     canvas.addEventListener('mouseleave', finishedPosition)
     canvas.addEventListener('mousemove', draw)
 
-
     // // event listener 手機板
     // canvas.addEventListener('touchstart', startPosition)
     // canvas.addEventListener('touchend', finishedPosition)
     // canvas.addEventListener('touchcancel', finishedPosition)
     // canvas.addEventListener('touchmove', draw)
     return () => {
-      console.log('destroyed');
+      console.log('destroyed')
       canvas.removeEventListener('mousedown', startPosition)
       canvas.removeEventListener('mouseup', finishedPosition)
       canvas.removeEventListener('mouseleave', finishedPosition)
@@ -81,13 +84,11 @@ const CreateSignCanvas = forwardRef((_, ref) => {
     return canvasDom.current
   }
 
-
   useImperativeHandle(ref, () => {
     return {
       getCanvas
-    };
-  });
-
+    }
+  })
 
   return (
     <div>
