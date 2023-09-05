@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import { pdfToImage, printMultiPage } from '../helpers/pdf'
-import { downloadMultiPagePDF } from '../helpers/downloadPDF'
+// import { pdfToImage, printMultiPage } from '../helpers/pdf'
+// import { downloadMultiPagePDF } from '../helpers/downloadPDF'
 import CanvasItem from './CanvasItem'
 import { Button, Input, Layout, Menu, Modal, Space } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectShowModal, setShowModal } from '../slice/SignSlice'
 import CreateSignCanvas from './CreateSignCanvas'
 
-const CanvasPanel = ({ pdfUrl, uploadFile, menuActiveKey }) => {
+const CanvasPanel = ({ pdfUrl, menuActiveKey }) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log('CanvasPanel render')
+  }
   // console.log('pdfFileList: ', pdfFileList);
   // const [pagesCanvas, setPdfDataList] = useState([])
   const [pagesCanvas, setPagesCanvas] = useState([])
@@ -22,7 +25,7 @@ const CanvasPanel = ({ pdfUrl, uploadFile, menuActiveKey }) => {
   // const inputOnChange2 = (e) => {
   //   renderPDF(e.target.files[0])
   // }
-  const childRef = useRef(null)
+  const childsRef = useRef([])
   const signCanvasdRef = useRef(null)
   const [inputText, setInputText] = useState('')
 
@@ -97,7 +100,7 @@ const CanvasPanel = ({ pdfUrl, uploadFile, menuActiveKey }) => {
         break
       case 'text':
         handleTextPaste()
-
+        break
       default:
         break
     }
@@ -117,10 +120,9 @@ const CanvasPanel = ({ pdfUrl, uploadFile, menuActiveKey }) => {
     setInputText(e.target.value)
   }
 
-  const onDraw = () => {}
-
   const handleTextPaste = () => {
-    childRef.current.updateText(inputText)
+    console.log('childsRef.current[0]: ', childsRef.current[0])
+    childsRef.current[0].updateText(inputText)
   }
 
   const handleSignImgPaste = () => {
@@ -128,7 +130,7 @@ const CanvasPanel = ({ pdfUrl, uploadFile, menuActiveKey }) => {
     const signCanvas = signCanvasdRef.current.getCanvas()
     const imgSrc = signCanvas.toDataURL('image/png')
     //
-    const getPDFCanvas = childRef.current.getPDFCanvas()
+    const getPDFCanvas = childsRef.current[0].getPDFCanvas()
     window.fabric.Image.fromURL(imgSrc, function (image) {
       // 設定簽名出現的位置及大小
       image.top = 20
@@ -147,7 +149,9 @@ const CanvasPanel = ({ pdfUrl, uploadFile, menuActiveKey }) => {
   }
 
   const downloadPDFSelf = () => {
-    childRef.current.downloadPDFSelf(downloadMultiPagePDF)
+    console.log('childsRef.current: ', childsRef.current)
+    // childsRef.current.downloadPDFSelf(downloadMultiPagePDF)
+    // childsRef.current.downloadPDFSelf(downloadMultiPagePDF)
   }
 
   return (
@@ -160,9 +164,9 @@ const CanvasPanel = ({ pdfUrl, uploadFile, menuActiveKey }) => {
           margin: '24px 32px'
         }}
       >
-        {/* <Button type="primary" onClick={showModal}>
-          Open Modal
-        </Button> */}
+        <Button type="primary" onClick={downloadPDFSelf}>
+          downloadPDFSelf
+        </Button>
 
         <Modal
           title="新增簽名"
@@ -196,10 +200,10 @@ const CanvasPanel = ({ pdfUrl, uploadFile, menuActiveKey }) => {
         {/* <CanvasItem
           pdfUrl={pdfUrl}
           uploadFile={uploadFile}
-          ref={childRef}
+          ref={childsRef}
         ></CanvasItem> */}
 
-        {pagesCanvas.map((pdfCanvas, i) => {
+        {pagesCanvas.map((pdfCanvas, index) => {
           return (
             <div
               style={{
@@ -207,11 +211,12 @@ const CanvasPanel = ({ pdfUrl, uploadFile, menuActiveKey }) => {
               }}
             >
               <CanvasItem
-                key={i}
+                key={index}
                 pdfCanvas={pdfCanvas}
+                index={index}
                 // pdfUrl={pdfUrl}
-                uploadFile={uploadFile}
-                ref={childRef}
+                // uploadFile={uploadFile}
+                ref={(ref) => (childsRef.current[index] = ref)}
               ></CanvasItem>
             </div>
           )

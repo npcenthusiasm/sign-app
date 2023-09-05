@@ -17,7 +17,11 @@ export const SignSlice = createSlice({
       state.currentSignRefPath = action.payload
     },
     setSignCanvasToList: (state, action) => {
-      state.signCanvas = [...state.signCanvas, action.payload]
+      const newState = [...state.signCanvas]
+      const { fabricCanvas, index } = action.payload
+      newState[index] = fabricCanvas
+      state.signCanvas = newState
+      // state.signCanvas = [...state.signCanvas, action.payload]
     },
 
     resetSignCanvas: (state) => {

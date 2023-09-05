@@ -1,15 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Button, Layout, Space } from 'antd'
+import { Button, Layout, Space, message } from 'antd'
 import Sign from '../components/Sign'
 import { Link, useNavigate } from 'react-router-dom'
 import StepProgress from '../components/StepProgress'
 import { useDispatch, useSelector } from 'react-redux'
-import { resetSignCanvas, selectSignCanvas } from '../slice/SignSlice'
-import { downloadMultiPagePDF } from '../helpers/downloadPDF'
+import {
+  resetSignCanvas,
+  selectSignCanvas,
+  selectSignToEditRefPath
+} from '../slice/SignSlice'
+import { canvasToPdfFile, downloadMultiPagePDF } from '../helpers/downloadPDF'
+import { storage } from '../config/firebase'
+import { ref, uploadBytes } from 'firebase/storage'
+import { getFileNameFromRefPath } from '../utils'
 
 export const SignView = () => {
   const [currentStep, setCurrentStep] = useState('3')
   const signCanvas = useSelector(selectSignCanvas)
+  const signToEditRefPath = useSelector(selectSignToEditRefPath)
   const navigete = useNavigate()
   const dispatch = useDispatch()
 
@@ -17,6 +25,26 @@ export const SignView = () => {
     console.log('signCanvas: ', signCanvas)
     downloadMultiPagePDF(signCanvas)
     setCurrentStep('4')
+  }
+
+  const handleSave = async () => {
+    const pdfInstance = canvasToPdfFile(signCanvas)
+    try {
+      const pdfFilesFolderRef = ref(storage, signToEditRefPath)
+      // const newFil
+      const blob = pdfInstance.output('blob')
+      const fileName = getFileNameFromRefPath(signToEditRefPath)
+      const newFile = new File([blob], fileName, {
+        type: 'application/pdf'
+      })
+      await uploadBytes(pdfFilesFolderRef, newFile)
+      // console.log('res: ', res)
+      message.success('儲存成功')
+    } catch (error) {
+      // onError(error)
+      console.error(error)
+      message.error('儲存失敗')
+    }
   }
 
   // const [pdfFileList, setpdfFileList] = useState([])
@@ -159,6 +187,9 @@ export const SignView = () => {
                 }}
               >
                 取消
+              </Button>
+              <Button type="primary" onClick={handleSave}>
+                儲存
               </Button>
               <Button type="primary" onClick={hamdleDownload}>
                 下載檔案

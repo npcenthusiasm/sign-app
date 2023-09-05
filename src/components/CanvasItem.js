@@ -3,8 +3,11 @@ import { pdfCanvasToImage } from '../helpers/pdf'
 import { useDispatch } from 'react-redux'
 import { setSignCanvasToList } from '../slice/SignSlice'
 
-const CanvasItem = forwardRef(({ pdfCanvas }, ref) => {
-  console.log('render')
+const CanvasItem = forwardRef(({ pdfCanvas, index }, ref) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log('CanvasItem render')
+  }
+
   const dispatch = useDispatch()
   const canvasDom = useRef(null)
   const fabricCanvas = useRef(null)
@@ -23,7 +26,12 @@ const CanvasItem = forwardRef(({ pdfCanvas }, ref) => {
 
   const preparePage = async () => {
     await handlePdfCanvasToFabricCanvas(pdfCanvas)
-    dispatch(setSignCanvasToList(fabricCanvas.current))
+    dispatch(
+      setSignCanvasToList({
+        fabricCanvas: fabricCanvas.current,
+        index
+      })
+    )
   }
 
   /**

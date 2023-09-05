@@ -44,15 +44,11 @@ function getItem(label, key, icon, children) {
 const Sign = () => {
   const [menuActiveKey, setMenuActiveKey] = useState('sign')
   const [uploadFile, setUploadFile] = useState(null)
-
   const [pdfUrl, setPdfUrl] = useState('')
   const signToEditRefPath = useSelector(selectSignToEditRefPath)
-
+  // const signCanvas = useSelector(selectSignCanvas)
   const dispatch = useDispatch()
 
-  // const currentSign = useSelector(selectCurrentSign)
-  //
-  // const selectedFileRef = ref(storage, `pdfFiles/${docId}`)
   const menuItems = [
     getItem('簽名', 'sign', <PieChartOutlined />),
     // getItem('日期', '2', <DesktopOutlined />),
@@ -71,15 +67,7 @@ const Sign = () => {
       }
     }
     dispatch(setShowModal(true))
-
-    //
-    //
-    //
   }
-
-  // useEffect(() => {
-
-  // }, [currentStep])
 
   useEffect(() => {
     const getSingleFileUrl = async () => {
@@ -131,6 +119,9 @@ const Sign = () => {
           />
         </Sider>
         <Content style={contentStyle}>
+          {/* <Button type="primary" onClick={saveFile}>
+            saveFile
+          </Button> */}
           <div>
             {/* <input
             type="file"
