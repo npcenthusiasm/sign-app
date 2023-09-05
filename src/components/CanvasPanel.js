@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 // import { pdfToImage, printMultiPage } from '../helpers/pdf'
 // import { downloadMultiPagePDF } from '../helpers/downloadPDF'
 import CanvasItem from './CanvasItem'
-import { Button, Input, Layout, Menu, Modal, Space } from 'antd'
+import { Input, Modal, Space } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectShowModal, setShowModal } from '../slice/SignSlice'
 import CreateSignCanvas from './CreateSignCanvas'
@@ -89,10 +89,10 @@ const CanvasPanel = ({ pdfUrl, menuActiveKey }) => {
     prepareItems()
   }, [pdfUrl])
 
-  const showModal = () => {
-    dispatch(setShowModal(true))
-    // setIsModalOpen(true);
-  }
+  // const showModal = () => {
+  //   dispatch(setShowModal(true))
+  //   // setIsModalOpen(true);
+  // }
   const handleOk = () => {
     switch (menuActiveKey) {
       case 'sign':
@@ -112,10 +112,10 @@ const CanvasPanel = ({ pdfUrl, menuActiveKey }) => {
     // setIsModalOpen(false);
     dispatch(setShowModal(false))
   }
-  const clickUseTexteBtn = () => {
-    // setIsModalOpen(false);
-    handleTextPaste()
-  }
+  // const clickUseTexteBtn = () => {
+  //   // setIsModalOpen(false);
+  //   handleTextPaste()
+  // }
   const onInputChange = (e) => {
     setInputText(e.target.value)
   }
@@ -141,18 +141,18 @@ const CanvasPanel = ({ pdfUrl, menuActiveKey }) => {
     })
   }
 
-  const downloadPDF2 = () => {
-    //
-    // downloadPDF(canvasInstanceList.value[0])
-    // downloadMultiPagePDF(pdfDataList)
-    downloadPDFSelf()
-  }
+  // const downloadPDF2 = () => {
+  //   //
+  //   // downloadPDF(canvasInstanceList.value[0])
+  //   // downloadMultiPagePDF(pdfDataList)
+  //   downloadPDFSelf()
+  // }
 
-  const downloadPDFSelf = () => {
-    console.log('childsRef.current: ', childsRef.current)
-    // childsRef.current.downloadPDFSelf(downloadMultiPagePDF)
-    // childsRef.current.downloadPDFSelf(downloadMultiPagePDF)
-  }
+  // const downloadPDFSelf = () => {
+  //   console.log('childsRef.current: ', childsRef.current)
+  //   // childsRef.current.downloadPDFSelf(downloadMultiPagePDF)
+  //   // childsRef.current.downloadPDFSelf(downloadMultiPagePDF)
+  // }
 
   return (
     <div>
@@ -164,9 +164,9 @@ const CanvasPanel = ({ pdfUrl, menuActiveKey }) => {
           margin: '24px 32px'
         }}
       >
-        <Button type="primary" onClick={downloadPDFSelf}>
+        {/* <Button type="primary" onClick={downloadPDFSelf}>
           downloadPDFSelf
-        </Button>
+        </Button> */}
 
         <Modal
           title="新增簽名"

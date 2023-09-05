@@ -42,11 +42,9 @@ function getItem(label, key, icon, children) {
 }
 
 const Sign = () => {
-  const [menuActiveKey, setMenuActiveKey] = useState('sign')
-  const [uploadFile, setUploadFile] = useState(null)
   const [pdfUrl, setPdfUrl] = useState('')
+  const [menuActiveKey, setMenuActiveKey] = useState('sign')
   const signToEditRefPath = useSelector(selectSignToEditRefPath)
-  // const signCanvas = useSelector(selectSignCanvas)
   const dispatch = useDispatch()
 
   const menuItems = [
@@ -61,10 +59,12 @@ const Sign = () => {
       const data = {
         title: '新增文字'
       }
+      console.log('data: ', data)
     } else if (key === 'sign') {
       const data = {
         title: '新增簽名'
       }
+      console.log('data: ', data)
     }
     dispatch(setShowModal(true))
   }
@@ -76,12 +76,8 @@ const Sign = () => {
       }
       try {
         message.info(`載入中 ...`)
-
-        //
         const pathRef = ref(storage, signToEditRefPath)
         const url = await getDownloadURL(pathRef)
-
-        setUploadFile(null)
         setPdfUrl(url)
         message.success(`載入成功`)
       } catch (error) {
@@ -92,14 +88,6 @@ const Sign = () => {
     getSingleFileUrl()
   }, [signToEditRefPath])
 
-  const inputOnChange2 = (e) => {
-    setPdfUrl('')
-    setUploadFile(e.target.files[0])
-  }
-
-  // useEffect(() => {
-  //
-  // }, [pdfFileList])
   return (
     <>
       <Header style={headerStyle}>
@@ -119,26 +107,10 @@ const Sign = () => {
           />
         </Sider>
         <Content style={contentStyle}>
-          {/* <Button type="primary" onClick={saveFile}>
-            saveFile
-          </Button> */}
-          <div>
-            {/* <input
-            type="file"
-            className="select"
-            accept="application/pdf"
-            onChange={inputOnChange2}></input> */}
-
-            {/* { JSON.stringify(pdfUrl)  } */}
-            <br />
-            {/* { state } */}
-          </div>
           <CanvasPanel
             pdfUrl={pdfUrl}
-            uploadFile={uploadFile}
             menuActiveKey={menuActiveKey}
           ></CanvasPanel>
-          {/* <CanvasPanel pdfFileList={[fileInfo.url]}></CanvasPanel> */}
         </Content>
       </Layout>
     </>

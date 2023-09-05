@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Layout, Space, message } from 'antd'
 import Sign from '../components/Sign'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import StepProgress from '../components/StepProgress'
 import { useDispatch, useSelector } from 'react-redux'
 import {
